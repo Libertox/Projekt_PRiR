@@ -27,3 +27,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
 	timing
 )
 
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
+	matrix
+)
+
