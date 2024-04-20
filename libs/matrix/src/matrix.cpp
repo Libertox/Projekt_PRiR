@@ -13,6 +13,29 @@ Matrix::Matrix(const int size){
     }
 }
 
+std::vector<std::vector<double>> Matrix::get_data(){
+    return data;
+}
+
+Matrix Matrix::operator*(const Matrix& other) const {
+    if (data[0].size() != other.data.size()) {
+        std::cout << "Matrix dimensions incompatible for multiplication\n";
+        return Matrix(data[0].size());
+    }
+
+    Matrix result(data.size());
+    for (int i = 0; i < data.size(); ++i) {
+        for (int j = 0; j < other.data[0].size(); ++j) {
+            double sum = 0;
+            for (int k = 0; k < other.data.size(); ++k) {
+                sum += data[i][k] * other.data[k][j];
+            }
+            result.data[i][j] = sum;
+        }
+    }
+    return result;
+}
+
 void Matrix::display() const{
      for (const auto& wiersz : data) {
             for (double element : wiersz) {
@@ -64,4 +87,12 @@ void Matrix::inverse(){
         }
         data = inverse_matrix;
 
+}
+
+void Matrix::round(){
+     for(int i = 0; i < data.size(); i++){
+        for(int j = 0; j < data[i].size(); j++){
+            data[i][j] = std::round(data[i][j]);
+        }
+    }
 }

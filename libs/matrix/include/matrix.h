@@ -11,4 +11,7 @@ public:
 
     void display() const;
     void inverse();
+    void round();
+    std::vector<std::vector<double>> get_data();
+    Matrix operator*(const Matrix& other) const;
 };
