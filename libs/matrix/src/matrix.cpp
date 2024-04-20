@@ -1,4 +1,5 @@
 #include "matrix.h"
+#include <omp.h>
 #include <vector>
 #include <cmath>
 
@@ -45,7 +46,7 @@ void Matrix::display() const{
         }
 }
 
-void Matrix::inverse(){
+void Matrix::inverse_sequential(){
        int size = data.size();
 
         std::vector<std::vector<double>> inverse_matrix(size, std::vector<double>(size, 0));
@@ -88,6 +89,57 @@ void Matrix::inverse(){
         data = inverse_matrix;
 
 }
+
+void Matrix::inverse_parallel(){
+       int size = data.size();
+
+        std::vector<std::vector<double>> inverse_matrix(size, std::vector<double>(size, 0));
+
+        #pragma omp parallel for
+        for (int i = 0; i < size; ++i) {
+            inverse_matrix[i][i] = 1;
+        }
+
+        std::vector<std::vector<double>> temp_matrix = data;
+
+        for (int k = 0; k < size; ++k) {
+            int max_row = k;
+            for (int i = k + 1; i < size; ++i) {
+                if (std::abs(temp_matrix[i][k]) > std::abs(temp_matrix[max_row][k])) {
+                    max_row = i;
+                }
+            }
+
+            if (max_row != k) {
+                std::swap(temp_matrix[k], temp_matrix[max_row]);
+                std::swap(inverse_matrix[k], inverse_matrix[max_row]);
+            }
+
+            double divisor = temp_matrix[k][k];
+
+             #pragma omp parallel for
+            for (int j = 0; j < size; ++j) {
+                temp_matrix[k][j] /= divisor;
+                inverse_matrix[k][j] /= divisor;
+            }
+
+            #pragma omp parallel for
+            for (int i = 0; i < size; ++i) {
+                if (i != k) {
+                    double multiplier = temp_matrix[i][k];
+
+                    #pragma omp parallel for
+                    for (int j = 0; j < size; ++j) {
+                        temp_matrix[i][j] -= multiplier * temp_matrix[k][j];
+                        inverse_matrix[i][j] -= multiplier * inverse_matrix[k][j];
+                    }
+                }
+            }
+        }
+        data = inverse_matrix;
+
+}
+
 
 void Matrix::round(){
      for(int i = 0; i < data.size(); i++){

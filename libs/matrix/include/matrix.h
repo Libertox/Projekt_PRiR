@@ -10,7 +10,8 @@ public:
     Matrix(const int size);
 
     void display() const;
-    void inverse();
+    void inverse_sequential();
+    void inverse_parallel();
     void round();
     std::vector<std::vector<double>> get_data();
     Matrix operator*(const Matrix& other) const;
